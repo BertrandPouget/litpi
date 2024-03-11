@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-%pip install st-gsheets-connection
 from streamlit_gsheets import GSheetsConnection
 import warnings
 warnings.filterwarnings("ignore")
