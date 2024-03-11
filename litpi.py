@@ -4,7 +4,7 @@ from streamlit_gsheets import GSheetsConnection
 import warnings
 warnings.filterwarnings("ignore")
 
-st.title("LitPi :house:\n Streamlit per Casa Lippi")
+st.title("LitPi\n Streamlit per Casa Lippi")
 
 conn = st.connection("gsheets", type=GSheetsConnection)
 df_chores = conn.read(worksheet="Chores", usecols=list(range(0,5)),
