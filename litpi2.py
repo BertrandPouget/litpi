@@ -6,7 +6,18 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # Set page configuration
-st.set_page_config(page_title="LitPi")
+st.set_page_config(page_title="LitPi", page_icon="🏡")
+st.markdown(
+    """
+<style>
+[data-testid="stMetricValue"] {
+    font-size: 20px;
+}
+</style>
+""",
+    unsafe_allow_html=True,
+)
+
 
 # Establish connection to Google Sheets
 conn = st.connection("gsheets", type=GSheetsConnection)
@@ -18,9 +29,8 @@ df_debts = conn.read(worksheet="Debts", usecols=list(range(0,2)), nrows=3, ttl=1
 fighters = ['Andrea', 'Marco', 'Martino']
 
 # 0. Title and Character Selection
-st.title('LitPi🏡\n Streamlit per Casa Lippi')
+st.title('🏡LitPi\nStreamlit per Casa Lippi')
 
-st.markdown('## Selezione personaggio')
 fighter = st.radio(label = "Chi sei?",
         options = fighters,
         index = None)
@@ -36,7 +46,7 @@ selected = option_menu(
 
 # 1. Chores
 if selected == 'Pulizie':
-    st.markdown("## Classifica")
+    st.markdown("### Classifica")
     points = df_chores.copy()
     points[fighters] = points[fighters].multiply(df_chores['Valore'], axis=0)
     rank = points[fighters].sum().sort_values(ascending=False)
@@ -45,7 +55,7 @@ if selected == 'Pulizie':
         medal = ":first_place_medal:" if i == 1 else ":second_place_medal:" if i == 2 else ":third_place_medal:" if i == 3 else ""
         st.markdown(f"{medal} **{fighter}** - *{score} punti*")
 
-    st.markdown("## Aggiornamento")
+    st.markdown("### Aggiornamento")
     chores = st.multiselect(label = "Seleziona i compiti che hai fatto",
                         options = df_chores.loc[:, "Compito"].tolist(),
                         default = None)
@@ -58,7 +68,7 @@ if selected == 'Pulizie':
         conn.update(worksheet="Chores", data=new_df_chores)
         progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
 
-    st.markdown("## Tabella Completa")
+    st.markdown("### Tabella Completa")
     def light_blue_columns(val):
         color = '#f3fafe'
         return f'background-color: {color}'
@@ -70,14 +80,14 @@ if selected == 'Pulizie':
 if selected == 'Spesa':
 
     shopping_list = df_shopping['Spesa'].dropna().tolist()
-    st.markdown("## Lista")
+    st.markdown("### Lista")
     if shopping_list == []:
         st.markdown("La lista della spesa è vuota")
     else:
         for i, item in enumerate(shopping_list):
             st.markdown(f"{i+1}. {item}")
 
-    st.markdown("## Aggiornamento")
+    st.markdown("### Aggiornamento")
     user_input = st.text_input("Aggiungi un elemento alla lista:")
     if st.button("Aggiungi"):
         progress_message = st.text("Aggiunta elemento...")
@@ -109,11 +119,11 @@ if selected == 'Spesa':
 # 3. Debts and Credits
 if selected == 'Debiti':
     debts = df_debts['Soldi'].tolist()
-    st.markdown("## Saldi")
+    st.markdown("### Saldi")
     for (fighter, debt) in zip(fighters, debts):
         st.metric(label = 'ciao', value=fighter, delta=round(debt,2), label_visibility='collapsed')
 
-    st.markdown("## Aggiornamento")
+    st.markdown("### Aggiornamento")
     credit = st.number_input(label = "Quanto hai pagato?", step = 1.00)
     debtors = st.multiselect(label = "Per chi hai pagato?",
                    options = fighters,
