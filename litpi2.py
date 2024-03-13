@@ -82,11 +82,8 @@ if selected == 'Pulizie':
         progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
 
     st.markdown("### Tabella Completa")
-    def light_blue_columns(x):
-        color = '#f3fafe'
-        return f'background-color: {color}'
     
-    df_chores = df_chores.style.applymap(lambda x: 'background-color: #f3fafe', subset=df_chores.columns[0:2])
+    df_chores = df_chores.style.applymap(lambda x: 'background-color: #fdf1d6', subset=df_chores.columns[0:2])
     st.dataframe(df_chores)
 
 # 2. Shopping List
