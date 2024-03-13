@@ -5,24 +5,25 @@ from streamlit_option_menu import option_menu
 import warnings
 warnings.filterwarnings("ignore")
 
+# Set page configuration
+st.set_page_config(page_title="LitPi", page_icon="🏡")
+
 # Establish connection to Google Sheets
 conn = st.connection("gsheets", type=GSheetsConnection)
 df_chores = conn.read(worksheet="Chores", usecols=list(range(0,5)),nrows=14, ttl=1)
 df_shopping = conn.read(worksheet="Shopping", usecols=list(range(0,1)), ttl=1)
 df_debts = conn.read(worksheet="Debts", usecols=list(range(0,2)), nrows=3, ttl=1)
 
-# Compute points and rank
-points = df_chores.copy()
-points[['Andrea', 'Martino', 'Marco']] = points[['Andrea', 'Martino', 'Marco']].multiply(df_chores['Valore'], axis=0)
-rank = points[['Andrea', 'Martino', 'Marco']].sum().sort_values(ascending=False)
+# Define fighters
+fighters = ['Andrea', 'Marco', 'Martino']
 
-st.title('LitPi :house:\n Streamlit per Casa Lippi')
+# 0. Title and Character Selection
+st.title('LitPi🏡\n Streamlit per Casa Lippi')
 
 st.markdown('## Selezione personaggio')
 fighter = st.radio(label = "Chi sei?",
-        options = ("Andrea", "Marco", "Martino"),
+        options = fighters,
         index = None)
-
 st.markdown('---')
 
 selected = option_menu(
@@ -33,7 +34,7 @@ selected = option_menu(
     default_index=0,
     orientation="horizontal")
 
-# 1. Pulizie
+# 1. Chores
 if selected == 'Pulizie':
     st.markdown("## Aggiornamento")
     chores = st.multiselect(label = "Seleziona i compiti che hai fatto",
@@ -49,14 +50,23 @@ if selected == 'Pulizie':
         progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
 
     st.markdown("## Classifica")
-    for i, (name, score) in enumerate(rank.items(), 1):
+    points = df_chores.copy()
+    points[fighters] = points[fighters].multiply(df_chores['Valore'], axis=0)
+    rank = points[fighters].sum().sort_values(ascending=False)
+
+    for i, (fighter, score) in enumerate(rank.items(), 1):
         medal = ":first_place_medal:" if i == 1 else ":second_place_medal:" if i == 2 else ":third_place_medal:" if i == 3 else ""
-        st.markdown(f"{medal} **{name}** - *{score} punti*")
+        st.markdown(f"{medal} **{fighter}** - *{score} punti*")
 
     st.markdown("## Tabella Completa")
+    def light_blue_columns(val):
+        color = '#f3fafe'
+        return f'background-color: {color}'
+    
+    df_chores = df_chores.style.applymap(lambda x: 'background-color: #f3fafe', subset=df_chores.columns[0:2])
     st.dataframe(df_chores)
 
-# 2. Spesa
+# 2. Shopping List
 if selected == 'Spesa':
     st.markdown("## Lista della spesa")
     shopping_list = df_shopping['Spesa'].dropna().tolist()
@@ -98,24 +108,23 @@ if selected == 'Spesa':
         progress_message.text("Lista svuotata!\nRicarica la pagina per vedere i risultati.")
         
 
-# 3. Debiti
+# 3. Debts and Credits
 if selected == 'Debiti':
-    fighters = ['Andrea', 'Marco', 'Martino']
     debts = df_debts['Soldi'].tolist()
 
     st.markdown("## Aggiornamento")
-    credito = st.number_input(label = "Quanto hai pagato?", step = 1.00)
-    debitori = st.multiselect(label = "Per chi hai pagato?",
+    credit = st.number_input(label = "Quanto hai pagato?", step = 1.00)
+    debtors = st.multiselect(label = "Per chi hai pagato?",
                    options = fighters,
                    default = None)
 
     if st.button("Aggiorna debiti"):
         progress_message = st.text(f"Aggiornamento dei debiti in corso...")
-        debito = -credito / len(debitori)
+        debito = -credit / len(debtors)
         new_df_debts = df_debts.copy(deep=True)
-        new_df_debts.loc[new_df_debts['Persona'] == fighter, 'Soldi'] += credito
-        for debitore in debitori:
-            new_df_debts.loc[new_df_debts['Persona'] == debitore, 'Soldi'] += debito
+        new_df_debts.loc[new_df_debts['Persona'] == fighter, 'Soldi'] += credit
+        for debtor in debtors:
+            new_df_debts.loc[new_df_debts['Persona'] == debtor, 'Soldi'] += debito
         conn.update(worksheet="Debts", data=new_df_debts)
         progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
 
