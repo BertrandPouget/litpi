@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from streamlit_gsheets import GSheetsConnection
 from streamlit_option_menu import option_menu
+import hmac
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -18,23 +19,56 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
 # Establish connection to Google Sheets
 conn = st.connection("gsheets", type=GSheetsConnection)
 df_chores = conn.read(worksheet="Chores", usecols=list(range(0,5)),nrows=14, ttl=1)
 df_shopping = conn.read(worksheet="Shopping", usecols=list(range(0,1)), ttl=1)
 df_debts = conn.read(worksheet="Debts", usecols=list(range(0,2)), nrows=3, ttl=1)
+df_passwords = conn.read(worksheet="Passwords", usecols=list(range(0,2)), nrows=3, ttl=1) 
 
-# Define fighters
+#0. Authentication
 fighters = ['Andrea', 'Marco', 'Martino']
 
-# 0. Title and Character Selection
-st.title('🏡LitPi\nStreamlit per Casa Lippi')
+def check_password():
+    """Returns `True` if the user had a correct password."""
 
-fighter = st.radio(label = "Chi sei?",
-        options = fighters,
-        index = None)
-st.markdown('---')
+    def login_form():
+        """Form with widgets to collect user information"""
+        with st.form("Credentials"):
+            st.title("Accedi a LitPi🏡")
+            st.text_input("Username", key="username")
+            st.text_input("Password", type="password", key="password")
+            st.form_submit_button("Log in", on_click=password_entered)
+
+    def password_entered():
+        """Checks whether a password entered by the user is correct."""
+        if st.session_state["username"] in st.secrets[
+            "passwords"
+        ] and hmac.compare_digest(
+            st.session_state["password"],
+            st.secrets.passwords[st.session_state["username"]],
+        ):
+            st.session_state["password_correct"] = True
+            st.session_state["fighter"] = st.session_state["username"]
+            del st.session_state["password"]  # Don't store the username or password.
+            del st.session_state["username"]
+        else:
+            st.session_state["password_correct"] = False
+
+    # Return True if the username + password is validated.
+    if st.session_state.get("password_correct", False):
+        return True
+
+    # Show inputs for username + password.
+    login_form()
+    if "password_correct" in st.session_state:
+        st.error("😕 User not known or password incorrect")
+    return False
+
+if not check_password():
+    st.stop()
+
+st.title(f"Benvenuto {st.session_state['fighter']}!")
 
 selected = option_menu(
     menu_title = None,
@@ -44,6 +78,8 @@ selected = option_menu(
     default_index=0,
     orientation="horizontal")
 
+fighter = st.session_state['fighter']
+
 # 1. Chores
 if selected == 'Pulizie':
     st.markdown("### Classifica")
@@ -51,9 +87,9 @@ if selected == 'Pulizie':
     points[fighters] = points[fighters].multiply(df_chores['Valore'], axis=0)
     rank = points[fighters].sum().sort_values(ascending=False)
 
-    for i, (fighter, score) in enumerate(rank.items(), 1):
+    for i, (person, score) in enumerate(rank.items(), 1):
         medal = ":first_place_medal:" if i == 1 else ":second_place_medal:" if i == 2 else ":third_place_medal:" if i == 3 else ""
-        st.markdown(f"{medal} **{fighter}** - *{score} punti*")
+        st.markdown(f"{medal} **{person}** - *{score} punti*")
 
     st.markdown("### Aggiornamento")
     chores = st.multiselect(label = "Seleziona i compiti che hai fatto",
@@ -69,7 +105,7 @@ if selected == 'Pulizie':
         progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
 
     st.markdown("### Tabella Completa")
-    def light_blue_columns(val):
+    def light_blue_columns(x):
         color = '#f3fafe'
         return f'background-color: {color}'
     
