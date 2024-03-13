@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from streamlit_gsheets import GSheetsConnection
 from streamlit_option_menu import option_menu
+from streamlit_image_select import image_select
 import hmac
 import warnings
 warnings.filterwarnings("ignore")
@@ -23,16 +24,29 @@ st.markdown(
 conn = st.connection("gsheets", type=GSheetsConnection)
 df_chores = conn.read(worksheet="Chores", usecols=list(range(0,5)),nrows=14, ttl=1)
 df_shopping = conn.read(worksheet="Shopping", usecols=list(range(0,1)), ttl=1)
-df_debts = conn.read(worksheet="Debts", usecols=list(range(0,2)), nrows=3, ttl=1)
-df_passwords = conn.read(worksheet="Passwords", usecols=list(range(0,2)), nrows=3, ttl=1) 
+df_debts = conn.read(worksheet="Debts", usecols=list(range(0,2)), nrows=3, ttl=1) 
 
 #0. Authentication
 st.title("Benvenuto su Litpi:house:")
 fighters = ['Andrea', 'Marco', 'Martino']
 
-fighter = st.radio(label = "Chi sei?",
-                   options = ("Andrea", "Marco", "Martino"),
-                   index = None)
+fighter_img = image_select(
+    label="Seleziona il tuo personaggio",
+    images=[
+        "images/andrea.jpg",
+        "images/marco.jpg",
+        "images/martino.jpg",
+    ],
+    captions=["Andrea", "Marco", "Martino"],
+    use_container_width=False
+)
+
+if fighter_img == "images/andrea.jpg":
+    fighter = "Andrea"
+if fighter_img == "images/marco.jpg":
+    fighter = "Marco"
+if fighter_img == "images/martino.jpg":
+    fighter = "Martino"
 
 selected = option_menu(
     menu_title = None,
@@ -42,7 +56,6 @@ selected = option_menu(
     default_index=0,
     orientation="horizontal")
 
-fighter = st.session_state['fighter']
 
 # 1. Chores
 if selected == 'Pulizie':
