@@ -8,7 +8,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # Set page configuration
-st.set_page_config(page_title="LitPi", page_icon="🏡")
+st.set_page_config(page_title="Litpi", page_icon="🏡")
 st.markdown(
     """
 <style>
