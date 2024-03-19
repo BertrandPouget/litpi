@@ -3,7 +3,6 @@ import pandas as pd
 from streamlit_gsheets import GSheetsConnection
 from streamlit_option_menu import option_menu
 from streamlit_image_select import image_select
-import hmac
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -129,9 +128,10 @@ if selected == 'Spesa':
 # 3. Debts and Credits
 if selected == 'Debiti':
     debts = df_debts['Soldi'].tolist()
+
     st.markdown("### Saldi")
-    for (fighter, debt) in zip(fighters, debts):
-        st.metric(label = 'ciao', value=fighter, delta=round(debt,2), label_visibility='collapsed')
+    for (person, debt) in zip(fighters, debts):
+        st.metric(label = 'ciao', value=person, delta=str(round(debt,2))+'€', label_visibility='collapsed')
 
     st.markdown("### Aggiornamento")
     credit = st.number_input(label = "Quanto hai pagato?", step = 1.00)
@@ -140,7 +140,7 @@ if selected == 'Debiti':
                    default = None)
 
     if st.button("Aggiorna debiti"):
-        progress_message = st.text(f"Aggiornamento dei debiti in corso...")
+        progress_message = st.text(f"Aggiornamento dei crediti di {fighter} in corso...")
         debito = -credit / len(debtors)
         new_df_debts = df_debts.copy(deep=True)
         new_df_debts.loc[new_df_debts['Persona'] == fighter, 'Soldi'] += credit
@@ -148,3 +148,4 @@ if selected == 'Debiti':
             new_df_debts.loc[new_df_debts['Persona'] == debtor, 'Soldi'] += debito
         conn.update(worksheet="Debts", data=new_df_debts)
         progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
+
