@@ -21,9 +21,6 @@ st.markdown(
 
 # Establish connection to Google Sheets
 conn = st.connection("gsheets", type=GSheetsConnection)
-df_chores = conn.read(worksheet="Chores", usecols=list(range(0,5)),nrows=14, ttl=1)
-df_shopping = conn.read(worksheet="Shopping", usecols=list(range(0,1)), ttl=1)
-df_debts = conn.read(worksheet="Debts", usecols=list(range(0,2)), nrows=3, ttl=1) 
 
 #0. Authentication
 st.title("Benvenuto su Litpi:house:")
@@ -58,6 +55,8 @@ selected = option_menu(
 
 # 1. Chores
 if selected == 'Pulizie':
+    df_chores = conn.read(worksheet="Chores", usecols=list(range(0,5)),nrows=14, ttl=1)
+
     st.markdown("### Classifica")
     points = df_chores.copy()
     points[fighters] = points[fighters].multiply(df_chores['Valore'], axis=0)
@@ -87,6 +86,7 @@ if selected == 'Pulizie':
 
 # 2. Shopping List
 if selected == 'Spesa':
+    df_shopping = conn.read(worksheet="Shopping", usecols=list(range(0,1)), ttl=1)
 
     shopping_list = df_shopping['Spesa'].dropna().tolist()
     st.markdown("### Lista")
@@ -127,6 +127,8 @@ if selected == 'Spesa':
 
 # 3. Debts and Credits
 if selected == 'Debiti':
+    df_debts = conn.read(worksheet="Debts", usecols=list(range(0,2)), nrows=3, ttl=1) 
+
     debts = df_debts['Soldi'].tolist()
 
     st.markdown("### Saldi")
