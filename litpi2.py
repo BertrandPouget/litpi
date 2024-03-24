@@ -3,6 +3,7 @@ import pandas as pd
 from streamlit_gsheets import GSheetsConnection
 from streamlit_option_menu import option_menu
 from streamlit_image_select import image_select
+from datetime import date
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -57,6 +58,10 @@ selected = option_menu(
 if selected == 'Pulizie':
     df_chores = conn.read(worksheet="Chores", usecols=list(range(0,5)),nrows=14, ttl=1)
 
+    hist_rows = 10
+    df_chores_history = conn.read(worksheet="Chores history", usecols=list(range(0,3)), ttl=1) 
+    df_chores_history.dropna(axis=0, inplace=True)
+
     st.markdown("### Classifica")
     points = df_chores.copy()
     points[fighters] = points[fighters].multiply(df_chores['Valore'], axis=0)
@@ -77,12 +82,29 @@ if selected == 'Pulizie':
         for chore in chores:
             new_df_chores.loc[new_df_chores['Compito'] == chore, fighter] += 1
         conn.update(worksheet="Chores", data=new_df_chores)
+
+        new_df_chores_history = df_chores_history.copy(deep=True)
+        new_df_chores_history = pd.concat([ pd.DataFrame([[fighter, date.today().strftime("%d/%m/%Y"), ', '.join(chores)]], columns=new_df_chores_history.columns), new_df_chores_history], ignore_index=True)
+        conn.update(worksheet="Chores history", data=new_df_chores_history)
+
         progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
 
     st.markdown("### Tabella Completa")
     
-    df_chores = df_chores.style.applymap(lambda x: 'background-color: #fdf1d6', subset=df_chores.columns[0:2])
-    st.dataframe(df_chores)
+    df_chores_style = df_chores.style.applymap(lambda x: 'background-color: #fdf1d6', subset=df_chores.columns[0:2])
+    st.dataframe(df_chores_style)
+
+
+    st.markdown("### Storico")
+
+    people = df_chores_history['Persona'].tolist()
+    dates = df_chores_history['Quando'].tolist()
+    actions = df_chores_history['Cosa'].tolist()
+    
+    for (i, person, date, action) in zip(range(hist_rows), people, dates, actions):
+        st.markdown(f" - {date}: {person} si è segnato {action} ")
+
+
 
 # 2. Shopping List
 if selected == 'Spesa':
@@ -129,6 +151,10 @@ if selected == 'Spesa':
 if selected == 'Debiti':
     df_debts = conn.read(worksheet="Debts", usecols=list(range(0,2)), nrows=3, ttl=1) 
 
+    hist_rows = 10
+    df_debts_history = conn.read(worksheet="Debts history", usecols=list(range(0,5)), ttl=1) 
+    df_debts_history.dropna(axis=0, subset=["Creditore"], inplace=True)
+
     debts = df_debts['Soldi'].tolist()
 
     st.markdown("### Saldi")
@@ -140,14 +166,31 @@ if selected == 'Debiti':
     debtors = st.multiselect(label = "Per chi hai pagato?",
                    options = fighters,
                    default = None)
+    reason = st.text_input(label = "Causale?", placeholder="Causale")
 
     if st.button("Aggiorna debiti"):
         progress_message = st.text(f"Aggiornamento dei crediti di {fighter} in corso...")
-        debito = -credit / len(debtors)
+        debit = -credit / len(debtors)
         new_df_debts = df_debts.copy(deep=True)
         new_df_debts.loc[new_df_debts['Persona'] == fighter, 'Soldi'] += credit
         for debtor in debtors:
-            new_df_debts.loc[new_df_debts['Persona'] == debtor, 'Soldi'] += debito
+            new_df_debts.loc[new_df_debts['Persona'] == debtor, 'Soldi'] += debit
         conn.update(worksheet="Debts", data=new_df_debts)
+
+        new_df_debts_history = df_debts_history.copy(deep=True)
+        new_df_debts_history = pd.concat([ pd.DataFrame([[fighter, credit, ', '.join(debtors), date.today().strftime("%d/%m/%Y"), reason]], columns=new_df_debts_history.columns), new_df_debts_history], ignore_index=True)
+        conn.update(worksheet="Debts history", data=new_df_debts_history)
+        
         progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
 
+
+    st.markdown("### Storico")
+
+    creditors = df_debts_history['Creditore'].tolist()
+    transactions = df_debts_history['Soldi'].tolist()
+    debtorss = df_debts_history['Debitori'].tolist()
+    dates = df_debts_history['Data'].tolist()
+    reasons = df_debts_history['Causale'].tolist()
+    
+    for (i, creditor, transaction, debtors, date, reason) in zip(range(hist_rows), creditors, transactions, debtorss, dates, reasons):
+        st.markdown(f" - {date}: {creditor} ha pagato {transaction:.2f}€ per {debtors}. Causale: {reason}")
