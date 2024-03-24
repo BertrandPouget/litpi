@@ -56,10 +56,11 @@ selected = option_menu(
 
 # 1. Chores
 if selected == 'Pulizie':
-    df_chores = conn.read(worksheet="Chores", usecols=list(range(0,5)),nrows=14, ttl=1)
+    df_chores_all = conn.read(worksheet="Chores", ttl=1)
+    df_chores = df_chores_all.iloc[0:14, 0:5]
+    df_chores_history = df_chores_all.iloc[:, 5:8]
 
-    hist_rows = 10
-    df_chores_history = conn.read(worksheet="Chores history", usecols=list(range(0,3)), ttl=1) 
+    hist_rows = 10 
     df_chores_history.dropna(axis=0, inplace=True)
 
     st.markdown("### Classifica")
@@ -69,7 +70,7 @@ if selected == 'Pulizie':
 
     for i, (person, score) in enumerate(rank.items(), 1):
         medal = ":first_place_medal:" if i == 1 else ":second_place_medal:" if i == 2 else ":third_place_medal:" if i == 3 else ""
-        st.markdown(f"{medal} **{person}** - *{score} punti*")
+        st.markdown(f"{medal} **{person}** - *{score:.0f} punti*")
 
     st.markdown("### Aggiornamento")
     chores = st.multiselect(label = "Seleziona i compiti che hai fatto",
@@ -81,17 +82,20 @@ if selected == 'Pulizie':
         new_df_chores = df_chores.copy(deep=True)
         for chore in chores:
             new_df_chores.loc[new_df_chores['Compito'] == chore, fighter] += 1
-        conn.update(worksheet="Chores", data=new_df_chores)
 
         new_df_chores_history = df_chores_history.copy(deep=True)
         new_df_chores_history = pd.concat([ pd.DataFrame([[fighter, date.today().strftime("%d/%m/%Y"), ', '.join(chores)]], columns=new_df_chores_history.columns), new_df_chores_history], ignore_index=True)
-        conn.update(worksheet="Chores history", data=new_df_chores_history)
+
+        new_df_chores_all = pd.concat([new_df_chores, new_df_chores_history], axis=1)
+        conn.update(worksheet="Chores", data=new_df_chores_all)
 
         progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
 
     st.markdown("### Tabella Completa")
     
-    df_chores_style = df_chores.style.applymap(lambda x: 'background-color: #fdf1d6', subset=df_chores.columns[0:2])
+    df_chores_style = df_chores.style \
+        .applymap(lambda x: 'background-color: #fdf1d6', subset=df_chores.columns[0:2]) \
+        .format(precision=0, thousands="'", decimal=".")
     st.dataframe(df_chores_style)
 
 
@@ -149,13 +153,14 @@ if selected == 'Spesa':
 
 # 3. Debts and Credits
 if selected == 'Debiti':
-    df_debts = conn.read(worksheet="Debts", usecols=list(range(0,2)), nrows=3, ttl=1) 
+    df_debts_all = conn.read(worksheet="Debts", ttl=1)
+    df_debts = df_debts_all.iloc[0:3, 0:2]
+    df_debts_history = df_debts_all.iloc[:, 2:7]
 
     hist_rows = 10
-    df_debts_history = conn.read(worksheet="Debts history", usecols=list(range(0,5)), ttl=1) 
     df_debts_history.dropna(axis=0, subset=["Creditore"], inplace=True)
 
-    debts = df_debts['Soldi'].tolist()
+    debts = df_debts['Bilancio'].tolist()
 
     st.markdown("### Saldi")
     for (person, debt) in zip(fighters, debts):
@@ -172,15 +177,16 @@ if selected == 'Debiti':
         progress_message = st.text(f"Aggiornamento dei crediti di {fighter} in corso...")
         debit = -credit / len(debtors)
         new_df_debts = df_debts.copy(deep=True)
-        new_df_debts.loc[new_df_debts['Persona'] == fighter, 'Soldi'] += credit
+        new_df_debts.loc[new_df_debts['Persona'] == fighter, 'Bilancio'] += credit
         for debtor in debtors:
-            new_df_debts.loc[new_df_debts['Persona'] == debtor, 'Soldi'] += debit
-        conn.update(worksheet="Debts", data=new_df_debts)
+            new_df_debts.loc[new_df_debts['Persona'] == debtor, 'Bilancio'] += debit
 
         new_df_debts_history = df_debts_history.copy(deep=True)
         new_df_debts_history = pd.concat([ pd.DataFrame([[fighter, credit, ', '.join(debtors), date.today().strftime("%d/%m/%Y"), reason]], columns=new_df_debts_history.columns), new_df_debts_history], ignore_index=True)
-        conn.update(worksheet="Debts history", data=new_df_debts_history)
         
+        new_df_debts_all = pd.concat([new_df_debts, new_df_debts_history], axis=1)
+        conn.update(worksheet="Debts", data=new_df_debts_all)
+
         progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
 
 
