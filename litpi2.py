@@ -60,7 +60,7 @@ if selected == 'Pulizie':
     df_chores = df_chores_all.iloc[0:14, 0:5]
     df_chores_history = df_chores_all.iloc[:, 6:9]
 
-    hist_rows = 10 
+    hist_rows = 5 
     df_chores_history.dropna(axis=0, inplace=True)
 
     st.markdown("### Classifica")
@@ -91,13 +91,6 @@ if selected == 'Pulizie':
 
         progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
 
-    st.markdown("### Tabella Completa")
-    
-    df_chores_style = df_chores.style \
-        .applymap(lambda x: 'background-color: #fdf1d6', subset=df_chores.columns[0:2]) \
-        .format(precision=0, thousands="'", decimal=".")
-    st.dataframe(df_chores_style)
-
 
     st.markdown("### Storico")
 
@@ -106,7 +99,19 @@ if selected == 'Pulizie':
     actions = df_chores_history['Cosa'].tolist()
     
     for (i, person, date, action) in zip(range(hist_rows), people, dates, actions):
-        st.markdown(f" - {date}: {person} si è segnato {action} ")
+        st.markdown(f""" - {date}  
+        **{person}** si è segnato **{action}** """)
+
+
+    st.markdown("### Tabella Completa")
+    
+    df_chores_style = df_chores.style \
+        .applymap(lambda x: 'background-color: #fdf1d6', subset=df_chores.columns[0:2]) \
+        .format(precision=0, thousands="'", decimal=".")
+    st.dataframe(df_chores_style)
+
+
+    
 
 
 
@@ -194,9 +199,14 @@ if selected == 'Debiti':
 
     creditors = df_debts_history['Creditore'].tolist()
     transactions = df_debts_history['Soldi'].tolist()
-    debtorss = df_debts_history['Debitori'].tolist()
+    debtors = df_debts_history['Debitori'].tolist()
     dates = df_debts_history['Data'].tolist()
     reasons = df_debts_history['Causale'].tolist()
     
-    for (i, creditor, transaction, debtors, date, reason) in zip(range(hist_rows), creditors, transactions, debtorss, dates, reasons):
-        st.markdown(f" - {date}: {creditor} ha pagato {transaction:.2f}€ per {debtors}. Causale: {reason}")
+    for (i, creditor, transaction, debtor, date, reason) in zip(range(hist_rows), creditors, transactions, debtors, dates, reasons):
+        # st.markdown(f" - {date}: {creditor} ha pagato {transaction:.2f}€ per {debtor}. Causale: {reason}")
+
+        if debtor.find("Andrea") != -1 and debtor.find("Marco") != -1 and debtor.find("Martino") != -1: 
+            debtor = "Tutti"
+        st.markdown(f""" - {date}: **{transaction:.2f}€** per *{reason}*  
+        Pagato da <span style="color:green">**{creditor}**</span> per <span style="color:red">**{debtor}**</span>""", unsafe_allow_html=True)
