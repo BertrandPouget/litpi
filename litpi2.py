@@ -58,7 +58,7 @@ selected = option_menu(
 if selected == 'Pulizie':
     df_chores_all = conn.read(worksheet="Chores", ttl=1)
     df_chores = df_chores_all.iloc[0:14, 0:5]
-    df_chores_history = df_chores_all.iloc[:, 5:8]
+    df_chores_history = df_chores_all.iloc[:, 6:9]
 
     hist_rows = 10 
     df_chores_history.dropna(axis=0, inplace=True)
@@ -86,7 +86,7 @@ if selected == 'Pulizie':
         new_df_chores_history = df_chores_history.copy(deep=True)
         new_df_chores_history = pd.concat([ pd.DataFrame([[fighter, date.today().strftime("%d/%m/%Y"), ', '.join(chores)]], columns=new_df_chores_history.columns), new_df_chores_history], ignore_index=True)
 
-        new_df_chores_all = pd.concat([new_df_chores, new_df_chores_history], axis=1)
+        new_df_chores_all = pd.concat([new_df_chores, pd.DataFrame([[""]], columns=[""]), new_df_chores_history], axis=1)
         conn.update(worksheet="Chores", data=new_df_chores_all)
 
         progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
@@ -155,7 +155,7 @@ if selected == 'Spesa':
 if selected == 'Debiti':
     df_debts_all = conn.read(worksheet="Debts", ttl=1)
     df_debts = df_debts_all.iloc[0:3, 0:2]
-    df_debts_history = df_debts_all.iloc[:, 2:7]
+    df_debts_history = df_debts_all.iloc[:, 3:8]
 
     hist_rows = 10
     df_debts_history.dropna(axis=0, subset=["Creditore"], inplace=True)
@@ -184,7 +184,7 @@ if selected == 'Debiti':
         new_df_debts_history = df_debts_history.copy(deep=True)
         new_df_debts_history = pd.concat([ pd.DataFrame([[fighter, credit, ', '.join(debtors), date.today().strftime("%d/%m/%Y"), reason]], columns=new_df_debts_history.columns), new_df_debts_history], ignore_index=True)
         
-        new_df_debts_all = pd.concat([new_df_debts, new_df_debts_history], axis=1)
+        new_df_debts_all = pd.concat([new_df_debts, pd.DataFrame([[""]], columns=[""]), new_df_debts_history], axis=1)
         conn.update(worksheet="Debts", data=new_df_debts_all)
 
         progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
