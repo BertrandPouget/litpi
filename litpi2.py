@@ -129,7 +129,7 @@ if selected == 'Spesa':
         new_df_shopping = df_shopping.copy(deep=True)
         new_df_shopping = pd.concat([pd.DataFrame({'Spesa': [user_input]}), df_shopping], ignore_index=True)
         conn.update(worksheet="Shopping", data=new_df_shopping)
-        progress_message.text("Elemento aggiunto!\nRicarica la pagina per vedere i risultati.")
+        # progress_message.text("Elemento aggiunto!\nRicarica la pagina per vedere i risultati.")
 
     elements_to_delete = st.multiselect(label = "Seleziona gli elementi da eliminare",
                                         options = shopping_list,
