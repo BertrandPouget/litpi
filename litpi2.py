@@ -60,7 +60,7 @@ if selected == 'Pulizie':
     df_chores = df_chores_all.iloc[0:14, 0:5]
     df_chores_history = df_chores_all.iloc[:, 6:9]
 
-    hist_rows = 5 
+    hist_rows = 10
     df_chores_history.dropna(axis=0, inplace=True)
 
     st.markdown("### Classifica")
