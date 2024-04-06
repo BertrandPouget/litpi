@@ -91,6 +91,8 @@ if selected == 'Pulizie':
 
         progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
 
+        st.rerun()
+
 
     st.markdown("### Storico")
 
@@ -136,6 +138,8 @@ if selected == 'Spesa':
         conn.update(worksheet="Shopping", data=new_df_shopping)
         progress_message.text("Elemento aggiunto!\nRicarica la pagina per vedere i risultati.")
 
+        st.rerun()
+
     elements_to_delete = st.multiselect(label = "Seleziona gli elementi da eliminare",
                                         options = shopping_list,
                                         default = None)    
@@ -146,6 +150,8 @@ if selected == 'Spesa':
             new_df_shopping.loc[new_df_shopping['Spesa'] == element, 'Spesa'] = None
         conn.update(worksheet="Shopping", data=new_df_shopping)
         progress_message.text("Elementi eliminati!\nRicarica la pagina per vedere i risultati.")
+
+        st.rerun()
     
     if st.button("Svuota"):
         progress_message = st.text("Svuotamento lista...")
@@ -154,7 +160,9 @@ if selected == 'Spesa':
             new_df_shopping.loc[new_df_shopping['Spesa'] == element, 'Spesa'] = None
         conn.update(worksheet="Shopping", data=new_df_shopping)
         progress_message.text("Lista svuotata!\nRicarica la pagina per vedere i risultati.")
-        
+
+        st.rerun()
+
 
 # 3. Debts and Credits
 if selected == 'Debiti':
@@ -193,6 +201,8 @@ if selected == 'Debiti':
         conn.update(worksheet="Debts", data=new_df_debts_all)
 
         progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
+
+        st.rerun()
 
 
     st.markdown("### Storico")
