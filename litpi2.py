@@ -84,7 +84,7 @@ if selected == 'Pulizie':
             new_df_chores.loc[new_df_chores['Compito'] == chore, fighter] += 1
 
         new_df_chores_history = df_chores_history.copy(deep=True)
-        new_df_chores_history = pd.concat([ pd.DataFrame([[fighter, date.today().strftime("%d/%m/%Y"), ', '.join(chores)]], columns=new_df_chores_history.columns), new_df_chores_history], ignore_index=True)
+        new_df_chores_history = pd.concat([ pd.DataFrame([[fighter, date.today().strftime("%d/%m/%Y, %H:%M"), ', '.join(chores)]], columns=new_df_chores_history.columns), new_df_chores_history], ignore_index=True)
 
         new_df_chores_all = pd.concat([new_df_chores, pd.DataFrame([[""]], columns=[""]), new_df_chores_history], axis=1)
         conn.update(worksheet="Chores", data=new_df_chores_all)
