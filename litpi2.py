@@ -3,7 +3,7 @@ import pandas as pd
 from streamlit_gsheets import GSheetsConnection
 from streamlit_option_menu import option_menu
 from streamlit_image_select import image_select
-from datetime import date
+from datetime import datetime
 import warnings
 warnings.filterwarnings("ignore")
 
@@ -84,12 +84,12 @@ if selected == 'Pulizie':
             new_df_chores.loc[new_df_chores['Compito'] == chore, fighter] += 1
 
         new_df_chores_history = df_chores_history.copy(deep=True)
-        new_df_chores_history = pd.concat([ pd.DataFrame([[fighter, date.today().strftime("%d/%m/%Y, %H:%M"), ', '.join(chores)]], columns=new_df_chores_history.columns), new_df_chores_history], ignore_index=True)
+        new_df_chores_history = pd.concat([ pd.DataFrame([[fighter, datetime.now().strftime("%d/%m/%Y, %H:%M"), ', '.join(chores)]], columns=new_df_chores_history.columns), new_df_chores_history], ignore_index=True)
 
         new_df_chores_all = pd.concat([new_df_chores, pd.DataFrame([[""]], columns=[""]), new_df_chores_history], axis=1)
         conn.update(worksheet="Chores", data=new_df_chores_all)
 
-        progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
+        # progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
 
         st.rerun()
 
@@ -136,7 +136,7 @@ if selected == 'Spesa':
         new_df_shopping = df_shopping.copy(deep=True)
         new_df_shopping = pd.concat([pd.DataFrame({'Spesa': [user_input]}), df_shopping], ignore_index=True)
         conn.update(worksheet="Shopping", data=new_df_shopping)
-        progress_message.text("Elemento aggiunto!\nRicarica la pagina per vedere i risultati.")
+        # progress_message.text("Elemento aggiunto!\nRicarica la pagina per vedere i risultati.")
 
         st.rerun()
 
@@ -149,7 +149,7 @@ if selected == 'Spesa':
         for element in elements_to_delete:
             new_df_shopping.loc[new_df_shopping['Spesa'] == element, 'Spesa'] = None
         conn.update(worksheet="Shopping", data=new_df_shopping)
-        progress_message.text("Elementi eliminati!\nRicarica la pagina per vedere i risultati.")
+        # progress_message.text("Elementi eliminati!\nRicarica la pagina per vedere i risultati.")
 
         st.rerun()
     
@@ -159,7 +159,7 @@ if selected == 'Spesa':
         for element in shopping_list:
             new_df_shopping.loc[new_df_shopping['Spesa'] == element, 'Spesa'] = None
         conn.update(worksheet="Shopping", data=new_df_shopping)
-        progress_message.text("Lista svuotata!\nRicarica la pagina per vedere i risultati.")
+        # progress_message.text("Lista svuotata!\nRicarica la pagina per vedere i risultati.")
 
         st.rerun()
 
@@ -200,7 +200,7 @@ if selected == 'Debiti':
         new_df_debts_all = pd.concat([new_df_debts, pd.DataFrame([[""]], columns=[""]), new_df_debts_history], axis=1)
         conn.update(worksheet="Debts", data=new_df_debts_all)
 
-        progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
+        # progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
 
         st.rerun()
 
