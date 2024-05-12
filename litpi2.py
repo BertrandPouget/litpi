@@ -97,11 +97,11 @@ if selected == 'Pulizie':
     st.markdown("### Storico")
 
     people = df_chores_history['Persona'].tolist()
-    dates = df_chores_history['Quando'].tolist()
+    days = df_chores_history['Quando'].tolist()
     actions = df_chores_history['Cosa'].tolist()
     
-    for (i, person, date, action) in zip(range(hist_rows), people, dates, actions):
-        st.markdown(f""" - {date}  
+    for (i, person, day, action) in zip(range(hist_rows), people, days, actions):
+        st.markdown(f""" - {day}  
         **{person}** si è segnato **{action}** """)
 
 
@@ -111,10 +111,6 @@ if selected == 'Pulizie':
         .applymap(lambda x: 'background-color: #fdf1d6', subset=df_chores.columns[0:2]) \
         .format(precision=0, thousands="'", decimal=".")
     st.dataframe(df_chores_style)
-
-
-    
-
 
 
 # 2. Shopping List
@@ -195,7 +191,7 @@ if selected == 'Debiti':
             new_df_debts.loc[new_df_debts['Persona'] == debtor, 'Bilancio'] += debit
 
         new_df_debts_history = df_debts_history.copy(deep=True)
-        new_df_debts_history = pd.concat([ pd.DataFrame([[fighter, credit, ', '.join(debtors), date.today().strftime("%d/%m/%Y"), reason]], columns=new_df_debts_history.columns), new_df_debts_history], ignore_index=True)
+        new_df_debts_history = pd.concat([ pd.DataFrame([[fighter, credit, ', '.join(debtors), datetime.now().strftime("%d/%m/%Y, %H:%M"), reason]], columns=new_df_debts_history.columns), new_df_debts_history], ignore_index=True)
         
         new_df_debts_all = pd.concat([new_df_debts, pd.DataFrame([[""]], columns=[""]), new_df_debts_history], axis=1)
         conn.update(worksheet="Debts", data=new_df_debts_all)
@@ -210,13 +206,13 @@ if selected == 'Debiti':
     creditors = df_debts_history['Creditore'].tolist()
     transactions = df_debts_history['Soldi'].tolist()
     debtors = df_debts_history['Debitori'].tolist()
-    dates = df_debts_history['Data'].tolist()
+    days = df_debts_history['Data'].tolist()
     reasons = df_debts_history['Causale'].tolist()
     
-    for (i, creditor, transaction, debtor, date, reason) in zip(range(hist_rows), creditors, transactions, debtors, dates, reasons):
-        # st.markdown(f" - {date}: {creditor} ha pagato {transaction:.2f}€ per {debtor}. Causale: {reason}")
+    for (i, creditor, transaction, debtor, day, reason) in zip(range(hist_rows), creditors, transactions, debtors, days, reasons):
+        # st.markdown(f" - {day}: {creditor} ha pagato {transaction:.2f}€ per {debtor}. Causale: {reason}")
 
         if debtor.find("Andrea") != -1 and debtor.find("Marco") != -1 and debtor.find("Martino") != -1: 
             debtor = "Tutti"
-        st.markdown(f""" - {date}: **{transaction:.2f}€** per *{reason}*  
+        st.markdown(f""" - {day}: **{transaction:.2f}€** per *{reason}*  
         Pagato da <span style="color:green">**{creditor}**</span> per <span style="color:red">**{debtor}**</span>""", unsafe_allow_html=True)
