@@ -58,7 +58,7 @@ selected = option_menu(
 if selected == 'Pulizie':
     df_chores_all = conn.read(worksheet="Chores", ttl=1)
     df_chores = df_chores_all.iloc[0:14, 0:5]
-    df_chores_history = df_chores_all.iloc[:, 5:8]
+    df_chores_history = df_chores_all[['Persona', 'Quando', 'Cosa']]
     st.write("Columns in df_chores_history:", df_chores_history.columns.tolist())
 
     hist_rows = 10
@@ -98,7 +98,6 @@ if selected == 'Pulizie':
     st.markdown("### Storico")
 
     people = df_chores_history['Persona'].tolist()
-    st.write(people)
     days = df_chores_history['Quando'].tolist()
     actions = df_chores_history['Cosa'].tolist()
     
@@ -166,7 +165,7 @@ if selected == 'Spesa':
 if selected == 'Debiti':
     df_debts_all = conn.read(worksheet="Debts", ttl=1)
     df_debts = df_debts_all.iloc[0:3, 0:2]
-    df_debts_history = df_debts_all.iloc[:, 3:8]
+    df_debts_history = df_debts_all[['Creditore', 'Soldi', 'Debitori', 'Data', 'Causale']]
 
     hist_rows = 10
     df_debts_history.dropna(axis=0, subset=["Creditore"], inplace=True)
