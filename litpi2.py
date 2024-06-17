@@ -57,9 +57,8 @@ selected = option_menu(
 # 1. Chores
 if selected == 'Pulizie':
     df_chores_all = conn.read(worksheet="Chores", ttl=1)
-    df_chores = df_chores_all.iloc[0:14, 0:5]
+    df_chores = df_chores_all[['Compito', 'Valore', 'Andrea', 'Marco', 'Martino']].head(14)
     df_chores_history = df_chores_all[['Persona', 'Quando', 'Cosa']]
-    st.write("Columns in df_chores_history:", df_chores_history.columns.tolist())
 
     hist_rows = 10
     df_chores_history.dropna(axis=0, inplace=True)
