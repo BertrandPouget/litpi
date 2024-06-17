@@ -24,7 +24,7 @@ st.markdown(
 conn = st.connection("gsheets", type=GSheetsConnection)
 
 #0. Authentication
-st.title("Benvenuto su Litpi:house:")
+st.title("Litpi:house:")
 fighters = ['Andrea', 'Marco', 'Martino']
 
 fighter_img = image_select(
@@ -59,6 +59,7 @@ if selected == 'Pulizie':
     df_chores_all = conn.read(worksheet="Chores", ttl=1)
     df_chores = df_chores_all.iloc[0:14, 0:5]
     df_chores_history = df_chores_all.iloc[:, 6:9]
+    st.write("Columns in df_chores_history:", df_chores_history.columns.tolist())
 
     hist_rows = 10
     df_chores_history.dropna(axis=0, inplace=True)
@@ -97,6 +98,7 @@ if selected == 'Pulizie':
     st.markdown("### Storico")
 
     people = df_chores_history['Persona'].tolist()
+    st.write(people)
     days = df_chores_history['Quando'].tolist()
     actions = df_chores_history['Cosa'].tolist()
     
