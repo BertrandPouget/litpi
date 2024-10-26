@@ -57,7 +57,7 @@ selected = option_menu(
 # 1. Chores
 if selected == 'Pulizie':
     df_chores_all = conn.read(worksheet="Chores", ttl=1)
-    df_chores = df_chores_all[['Compito', 'Valore', 'Andrea', 'Marco', 'Martino']].head(14)
+    df_chores = df_chores_all[['Compito', 'Valore', 'Andrea', 'Marco', 'Martino']].head(15)
     df_chores_history = df_chores_all[['Persona', 'Quando', 'Cosa']]
 
     hist_rows = 10
@@ -68,8 +68,23 @@ if selected == 'Pulizie':
     points[fighters] = points[fighters].multiply(df_chores['Valore'], axis=0)
     rank = points[fighters].sum().sort_values(ascending=False)
 
-    for i, (person, score) in enumerate(rank.items(), 1):
-        medal = ":first_place_medal:" if i == 1 else ":second_place_medal:" if i == 2 else ":third_place_medal:" if i == 3 else ""
+    prev_score = None
+    rank_num = 0
+
+    for person, score in rank.items():
+        if score != prev_score:
+            rank_num += 1
+            prev_score = score
+
+        if rank_num == 1:
+            medal = ":first_place_medal:"
+        elif rank_num == 2:
+            medal = ":second_place_medal:"
+        elif rank_num == 3:
+            medal = ":third_place_medal:"
+        else:
+            medal = ""
+
         st.markdown(f"{medal} **{person}** - *{score:.0f} punti*")
 
     st.markdown("### Aggiornamento")
@@ -88,8 +103,6 @@ if selected == 'Pulizie':
 
         new_df_chores_all = pd.concat([new_df_chores, pd.DataFrame([[""]], columns=[""]), new_df_chores_history], axis=1)
         conn.update(worksheet="Chores", data=new_df_chores_all)
-
-        # progress_message.text("Aggiornamento completato!\nRicarica la pagina per vedere i risultati.")
 
         st.rerun()
 
@@ -132,7 +145,6 @@ if selected == 'Spesa':
         new_df_shopping = df_shopping.copy(deep=True)
         new_df_shopping = pd.concat([pd.DataFrame({'Spesa': [user_input]}), df_shopping], ignore_index=True)
         conn.update(worksheet="Shopping", data=new_df_shopping)
-        # progress_message.text("Elemento aggiunto!\nRicarica la pagina per vedere i risultati.")
 
         st.rerun()
 
@@ -145,7 +157,6 @@ if selected == 'Spesa':
         for element in elements_to_delete:
             new_df_shopping.loc[new_df_shopping['Spesa'] == element, 'Spesa'] = None
         conn.update(worksheet="Shopping", data=new_df_shopping)
-        # progress_message.text("Elementi eliminati!\nRicarica la pagina per vedere i risultati.")
 
         st.rerun()
     
@@ -155,7 +166,6 @@ if selected == 'Spesa':
         for element in shopping_list:
             new_df_shopping.loc[new_df_shopping['Spesa'] == element, 'Spesa'] = None
         conn.update(worksheet="Shopping", data=new_df_shopping)
-        # progress_message.text("Lista svuotata!\nRicarica la pagina per vedere i risultati.")
 
         st.rerun()
 
