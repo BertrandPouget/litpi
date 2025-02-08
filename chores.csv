@@ -1,0 +1,43 @@
+Chore,ChoreKeyword,Difficulty
+Caricare la lavastoviglie,Lavastoviglie (carico),1.0
+Scaricare la lavastoviglie,Lavastoviglie (scarico),1.0
+Pulire le superfici,Piano Cottura,2.0
+Pulire il WC,WC,3.0
+Pulire il lavandino,Lavandino,2.0
+Pulire il bidet,Bidet,2.0
+Pulire la doccia,Doccia,2.0
+Aspirare il pavimento,Pavimento (aspirazione),1.0
+Lavare il pavimento,Pavimento (lavaggio),3.0
+Differenziare la plastica,Plastica,1.0
+Differenziare l'indifferenziato,Indifferenziato,1.0
+Portare fuori la spazzatura,Spazzatura,2.0
+Pulire il forno,Forno,2.5
+Sbrinare il freezer,Freezer,2.5
+Lavare le finestre,Finestre,2.5
+Spolverare i mobili,Mobili,1.0
+Pulire i lampadari,Lampadari,2.0
+Stirare,Stiratura,2.5
+Stendere i panni,Panni (stesi),1.5
+Ritirare e piegare i panni asciutti,Panni (piegati),1.5
+Fare la lavatrice,Lavatrice,1.5
+Pulire la lavatrice,Lavatrice (filtro),2.0
+Pulire l'asciugatrice,Asciugatrice (filtro),2.0
+Pulire i vetri della doccia,Vetri doccia,2.0
+Disincrostare il soffione della doccia,Soffione doccia,2.0
+Pulire i termosifoni,Termosifoni,2.0
+Pulire i tappeti,Tappeti,2.0
+Pulire e organizzare l'ingresso,Ingresso,1.5
+Riordinare l'armadio,Armadio,2.0
+Lavare cuscini e coperte,Cuscini e coperte,2.5
+Pulire la cappa aspirante,Cappa aspirante,2.5
+Pulire il microonde,Microonde,1.5
+Pulire il tostapane,Tostapane,1.0
+Lavare i piatti a mano,Piatti,2.0
+Svuotare e pulire il bidone,Bidone,2.0
+Pulire le maniglie delle porte,Maniglie porte,1.0
+Pulire prese e interruttori,Prese e interruttori,1.0
+Aspirare divani e poltrone,Divani e poltrone,2.0
+Riordinare la dispensa,Dispensa,1.5
+Pulire il balcone,Balcone,2.5
+Lavare l'auto,Auto,2.5
+Pulire i bidoni della differenziata,Bidoni differenziata,2.5
